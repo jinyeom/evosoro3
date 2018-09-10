@@ -16,12 +16,11 @@ class OrderedGraph(DiGraph):
 
 class Network(object):
     """Base class for networks."""
-
     input_node_names = []
 
     def __init__(self, output_node_names):
         self.output_node_names = output_node_names
-        self.graph = OrderedGraph()  # preserving order is necessary for checkpointing
+        self.graph = OrderedGraph()
         self.freeze = False
         self.allow_neutral_mutations = False
         self.num_consecutive_mutations = 1
@@ -43,12 +42,11 @@ class Network(object):
 
 class CPPN(Network):
     """A Compositional Pattern Producing Network"""
-
     input_node_names = ['x', 'y', 'z', 'd', 'b']
     activation_functions = [np.sin, np.abs, neg_abs, np.square, neg_square, sqrt_abs, neg_sqrt_abs]
 
     def __init__(self, output_node_names):
-        Network.__init__(self, output_node_names)
+        super().__init__(self, output_node_names)
         self.set_minimal_graph()
         self.mutate()
 
@@ -100,8 +98,13 @@ class CPPN(Network):
                 self.graph.node[name]["state"] = input_b
                 self.graph.node[name]["evaluated"] = True
 
-    def mutate(self, num_random_node_adds=5, num_random_node_removals=0, num_random_link_adds=10,
-               num_random_link_removals=5, num_random_activation_functions=100, num_random_weight_changes=100):
+    def mutate(self, 
+               num_random_node_adds=5, 
+               num_random_node_removals=0, 
+               num_random_link_adds=10,
+               num_random_link_removals=5, 
+               num_random_activation_functions=100, 
+               num_random_weight_changes=100):
 
         # TODO: set default arg val via brute force search
         # TODO: weight std is defaulted to 0.5, to change this we can't just put it in args of mutate() b/c getargspec
@@ -137,13 +140,9 @@ class CPPN(Network):
         self.prune_network()
         return variation_type, variation_degree
 
-    ###############################################
-    #   Mutation functions
-    ###############################################
-
     def add_node(self):
         # choose two random nodes (between which a link could exist)
-        if len(self.graph.edges()) == 0:
+        if not len(self.graph.edges()):
             return "NoEdges"
         this_edge = random.choice(self.graph.edges())
         node1 = this_edge[0]
@@ -247,10 +246,6 @@ class CPPN(Network):
         self.graph[node1][node2]["weight"] = new_weight
         return float(new_weight - old_weight)
 
-    ###############################################
-    #   Helper functions for mutation
-    ###############################################
-
     def prune_network(self):
         """Remove erroneous nodes and edges post mutation."""
         done = False
@@ -300,19 +295,26 @@ class CPPN(Network):
 
 
 class DirectEncoding(Network):
-    def __init__(self, output_node_name, orig_size_xyz, lower_bound=-1, upper_bound=1, func=None, symmetric=True,
-                 p=None, scale=None, start_val=None, mutate_start_val=False):
+    def __init__(self, 
+                 output_node_name, 
+                 orig_size_xyz, 
+                 lower_bound=-1, 
+                 upper_bound=1, 
+                 func=None, 
+                 symmetric=True,
+                 p=None, 
+                 scale=None, 
+                 start_val=None, 
+                 mutate_start_val=False):
 
-        Network.__init__(self, [output_node_name])
+        super().__init__(self, [output_node_name])
 
         self.direct_encoding = True
         self.allow_neutral_mutations = True
         self.size = orig_size_xyz
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
-        if p is None:
-            p = 1/np.product(self.size, dtype='f')
-        self.p = p
+        self.p = 1.0 / np.product(self.size, dtype='f') if p is None else p
         self.scale = scale
         self.func = func
         self.symmetric = symmetric
@@ -331,17 +333,6 @@ class DirectEncoding(Network):
             self.values = self.func(self.values)
 
         self.values = np.clip(self.values, self.lower_bound, self.upper_bound)
-
-    # @property
-    # def values(self):
-    #     return self._values
-    #
-    # @values.setter
-    # def values(self, values):
-    #     if self.func is None:
-    #         self._values = values
-    #     else:
-    #         self._values = self.func(values)
 
     def set_input_node_states(self, *args, **kwargs):
         pass

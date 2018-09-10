@@ -9,16 +9,13 @@ from evosoro.tools.utils import sigmoid, xml_format, dominates
 
 class Genotype(object):
     """A container for multiple networks, 'genetic code' copied with modification to produce offspring."""
-
     def __init__(self, orig_size_xyz=(6, 6, 6)):
-
         """
         Parameters
         ----------
         orig_size_xyz : 3-tuple (x, y, z)
             Defines the original 3 dimensions for the cube of voxels corresponding to possible networks outputs. The
             maximum number of SofBot voxel components is x*y*z, a full cube.
-
         """
         self.networks = []
         self.all_networks_outputs = []
@@ -64,7 +61,6 @@ class Genotype(object):
 
     def express(self):
         """Calculate the genome networks outputs, the physical properties of each voxel for simulation"""
-
         for network in self:
             if not network.direct_encoding:
                 for name in network.graph.nodes():
@@ -152,8 +148,16 @@ class GenotypeToPhenotypeMap(object):
         new.__dict__.update(deepcopy(self.__dict__, memo))
         return new
 
-    def add_map(self, name, tag, func=sigmoid, output_type=float, dependency_order=None, params=None, param_tags=None,
-                env_kws=None, logging_stats=np.mean):
+    def add_map(self, 
+                name, 
+                tag, 
+                func=sigmoid, 
+                output_type=float, 
+                dependency_order=None, 
+                params=None, 
+                param_tags=None,
+                env_kws=None, 
+                logging_stats=np.mean):
         """Add an association between a genotype output and a VoxCad parameter.
 
         Parameters
@@ -221,7 +225,12 @@ class GenotypeToPhenotypeMap(object):
                               "env_kws": env_kws,
                               "logging_stats": logging_stats}
 
-    def add_output_dependency(self, name, dependency_name, requirement, material_if_true=None, material_if_false=None):
+    def add_output_dependency(self, 
+                              name, 
+                              dependency_name, 
+                              requirement, 
+                              material_if_true=None, 
+                              material_if_false=None):
         """Add a dependency between two genotype outputs.
 
         Parameters
@@ -240,7 +249,6 @@ class GenotypeToPhenotypeMap(object):
 
         material_if_false : int
             The material otherwise
-
         """
         self.dependencies[name] = {"depends_on": dependency_name,
                                    "requirement": requirement,
@@ -303,7 +311,6 @@ class SoftBot(object):
     """A SoftBot is a 3D creature composed of a continuous arrangement of connected voxels with varying softness."""
 
     def __init__(self, max_id, objective_dict, genotype, phenotype):
-
         """Initialize an individual SoftBot for physical simulation within VoxCad.
 
         Parameters
@@ -319,11 +326,9 @@ class SoftBot(object):
 
         phenotype : Phenotype cls
             The physical manifestation of the genotype which defines an individual in simulation.
-
         """
         self.genotype = genotype()  # initialize new random genome
         self.phenotype = phenotype(self.genotype)  # calc phenotype from genome
-
         self.id = max_id
         self.md5 = "none"
         self.dominated_by = []  # other individuals in the population that are superior according to evaluation

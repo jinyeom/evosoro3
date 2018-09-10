@@ -8,7 +8,6 @@ from evosoro.tools.utils import xml_format
 
 class VoxCadParams(object):
     """Container for VoxCad parameters."""
-
     def __init__(self):
         self.sub_groups = []
         self.new_param_tag_dict = {}
@@ -20,17 +19,23 @@ class VoxCadParams(object):
 
 class Sim(VoxCadParams):
     """Container for VoxCad simulation parameters."""
-
-    def __init__(self, self_collisions_enabled=True, simulation_time=10, dt_frac=0.7, stop_condition=2,
-                 fitness_eval_init_time=2, equilibrium_mode=0, min_temp_fact=0.1, max_temp_fact_change=0.00001,
-                 max_stiffness_change=10000, min_elastic_mod=5e006, max_elastic_mod=5e008, afterlife_time=0,
+    def __init__(self, 
+                 self_collisions_enabled=True, 
+                 simulation_time=10, 
+                 dt_frac=0.7, 
+                 stop_condition=2,
+                 fitness_eval_init_time=2, 
+                 equilibrium_mode=0, 
+                 min_temp_fact=0.1, 
+                 max_temp_fact_change=0.00001,
+                 max_stiffness_change=10000, 
+                 min_elastic_mod=5e006, 
+                 max_elastic_mod=5e008, 
+                 afterlife_time=0,
                  mid_life_freeze_time=0):
-
-        VoxCadParams.__init__(self)
-
+        super().__init__(self)
         self.sub_groups = ["Integration", "Damping", "Collisions", "Features", "StopCondition", "EquilibriumMode", "GA"]
         # custom nested things in "SurfMesh", "CMesh"
-
         self.self_collisions_enabled = self_collisions_enabled
         self.simulation_time = simulation_time
         self.dt_frac = dt_frac
@@ -42,22 +47,28 @@ class Sim(VoxCadParams):
         self.max_stiffness_change = max_stiffness_change
         self.min_elastic_mod = min_elastic_mod
         self.max_elastic_mod = max_elastic_mod
-
         self.afterlife_time = afterlife_time
         self.mid_life_freeze_time = mid_life_freeze_time
 
 
 class Env(VoxCadParams):
     """Container for VoxCad environment parameters."""
-
-    def __init__(self, frequency=4.0, gravity_enabled=1, temp_enabled=1, floor_enabled=1, floor_slope=0.0,
-                 lattice_dimension=0.01, fat_stiffness=5e+006, bone_stiffness=5e+008, muscle_stiffness=5e+006,
-                 sticky_floor=0, time_between_traces=0, actuation_variance=0, temp_amp=39):
-
-        VoxCadParams.__init__(self)
-
+    def __init__(self, 
+                 frequency=4.0, 
+                 gravity_enabled=1, 
+                 temp_enabled=1, 
+                 floor_enabled=1, 
+                 floor_slope=0.0,
+                 lattice_dimension=0.01, 
+                 fat_stiffness=5e+006, 
+                 bone_stiffness=5e+008, 
+                 muscle_stiffness=5e+006,
+                 sticky_floor=0, 
+                 time_between_traces=0, 
+                 actuation_variance=0, 
+                 temp_amp=39):
+        super().__init__(self)
         self.sub_groups = ["Fixed_Regions", "Forced_Regions", "Gravity", "Thermal"]
-
         self.frequency = frequency
         self.gravity_enabled = gravity_enabled
         self.floor_enabled = floor_enabled
@@ -78,15 +89,34 @@ class Material(VoxCadParams):
 
     # TODO: this class is currently not used
 
-    def __init__(self, lattice_dimension=0.01, softest_material=5, material_stiffness=5e+006, dim_adj=1, line_offset=0,
-                 layer_offset=0, squeeze=1):
-        VoxCadParams.__init__(self)
-
+    def __init__(self, 
+                 lattice_dimension=0.01, 
+                 softest_material=5, 
+                 material_stiffness=5e+006, 
+                 dim_adj=1, 
+                 line_offset=0,
+                 layer_offset=0, 
+                 squeeze=1):
+        super().__init__(self)
         self.sub_groups = ["Lattice", "Voxel"]
         self.palette = {}
 
-    def add_material_to_palette(self, id, mat_type, name, rgba, mat_model, elastic_mod, plastic_mod, yield_stress,
-                                fail_model, fail_stress, fail_strain, density, poissons_ratio, cte, u_static,
+    def add_material_to_palette(self, 
+                                id, 
+                                mat_type, 
+                                name, 
+                                rgba, 
+                                mat_model, 
+                                elastic_mod, 
+                                plastic_mod, 
+                                yield_stress,
+                                fail_model, 
+                                fail_stress, 
+                                fail_strain, 
+                                density, 
+                                poissons_ratio, 
+                                cte, 
+                                u_static,
                                 u_dynamic):
         self.palette[id] = {"Name": name}
         # TODO: match structure
@@ -94,9 +124,8 @@ class Material(VoxCadParams):
 
 class ObjectiveDict(dict):
     """A dictionary describing the objectives for optimization. See self.add_objective()."""
-
     def __init__(self):
-        super(ObjectiveDict, self).__init__()
+        super().__init__()
         self.max_rank = 0
 
     # def __setitem__(self, key, value):
@@ -104,7 +133,13 @@ class ObjectiveDict(dict):
     #     raise SyntaxError
     # TODO: want to restrict input but this prevents deep copying: maybe instead just make object with embedded dict
 
-    def add_objective(self, name, maximize, tag, node_func=None, output_node_name=None, logging_only=False):
+    def add_objective(self, 
+                      name, 
+                      maximize, 
+                      tag, 
+                      node_func=None, 
+                      output_node_name=None, 
+                      logging_only=False):
         """Add an optimization objective to the dictionary.
 
         Objectives must be added in order of importance, however fitness is fixed to be the most important.
@@ -142,13 +177,13 @@ class ObjectiveDict(dict):
             for rank in reversed(list(range(len(self)))):
                 self[rank+1] = self[rank]
 
-        super(ObjectiveDict, self).__setitem__(curr_rank, {"name": name,
-                                                           "maximize": maximize,
-                                                           "tag": xml_format(tag) if tag is not None else None,
-                                                           "worst_value": -10e6 if maximize else 10e6,
-                                                           "node_func": node_func,
-                                                           "output_node_name": output_node_name,
-                                                           "logging_only": logging_only})
+        super().__setitem__(curr_rank, {"name": name,
+                                        "maximize": maximize,
+                                        "tag": xml_format(tag) if tag is not None else None,
+                                        "worst_value": -10e6 if maximize else 10e6,
+                                        "node_func": node_func,
+                                        "output_node_name": output_node_name,
+                                        "logging_only": logging_only})
 
         # TODO: logging_only 'objectives' should be a separate 'SimStats' class
         self.max_rank += 1
