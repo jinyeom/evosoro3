@@ -46,7 +46,7 @@ class CPPN(Network):
     activation_functions = [np.sin, np.abs, neg_abs, np.square, neg_square, sqrt_abs, neg_sqrt_abs]
 
     def __init__(self, output_node_names):
-        super().__init__(self, output_node_names)
+        super().__init__(output_node_names)
         self.set_minimal_graph()
         self.mutate()
 
@@ -307,7 +307,7 @@ class DirectEncoding(Network):
                  start_val=None, 
                  mutate_start_val=False):
 
-        super().__init__(self, [output_node_name])
+        super().__init__([output_node_name])
 
         self.direct_encoding = True
         self.allow_neutral_mutations = True

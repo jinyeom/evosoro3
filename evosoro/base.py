@@ -33,7 +33,7 @@ class Sim(VoxCadParams):
                  max_elastic_mod=5e008, 
                  afterlife_time=0,
                  mid_life_freeze_time=0):
-        super().__init__(self)
+        super().__init__()
         self.sub_groups = ["Integration", "Damping", "Collisions", "Features", "StopCondition", "EquilibriumMode", "GA"]
         # custom nested things in "SurfMesh", "CMesh"
         self.self_collisions_enabled = self_collisions_enabled
@@ -67,7 +67,7 @@ class Env(VoxCadParams):
                  time_between_traces=0, 
                  actuation_variance=0, 
                  temp_amp=39):
-        super().__init__(self)
+        super().__init__()
         self.sub_groups = ["Fixed_Regions", "Forced_Regions", "Gravity", "Thermal"]
         self.frequency = frequency
         self.gravity_enabled = gravity_enabled
@@ -97,7 +97,7 @@ class Material(VoxCadParams):
                  line_offset=0,
                  layer_offset=0, 
                  squeeze=1):
-        super().__init__(self)
+        super().__init__()
         self.sub_groups = ["Lattice", "Voxel"]
         self.palette = {}
 
